@@ -1,0 +1,221 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>RethinkDB</title>
+		<meta name="author" content="Etienne Roudeix">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/beige.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section>
+					<h1>RethinkDB</h1>
+					<p>
+						<small>Talking : Etienne Roudeix / <a href="http://twitter.com/__etienne">@__etienne</a></small>
+					</p>
+				</section>
+				<section>
+					<h2>Banalities</h2>
+					<p>Free software : AGPL</p>
+					<p>Eponymous company</p>
+					<p>v1 : 2011</p>
+					<p>NoSQL</p>
+					<p>JSON documents</p>
+				</section>
+				<section>
+					<section>
+						<h2>ReQL</h2>
+						<h3>RethinkDB API</h3>
+					</section>
+					<section data-markdown>
+						<script type="text/template">
+							##Query
+							```javascript
+							r.db('my_database').table('my_table_1')
+								.filter({
+									status: "available"
+								})
+								.filter(
+									r.row('created_at').gt(r.now().sub(3600))
+								)
+								.orderBy(r.desc('updated_at'))
+								.limit(5)
+							```
+						</script>
+					</section>
+					<section data-markdown>
+						<script type="text/template">
+							##Update
+							```javascript
+							r.db('my_database').table('my_table_1')
+								.filter({
+									status: "available"
+								})
+								.filter(
+									r.row('created_at').gt(r.now().sub(3600))
+								)
+								.orderBy(r.desc('updated_at'))
+								.limit(5)
+								.update({
+									is_new: true,
+									updated_at: r.now()
+								})
+							```
+						</script>
+					</section>
+					<section data-markdown>
+						<script type="text/template">
+							##Map
+							```javascript
+							r.db('my_database').table('my_table_1')
+								.map(function (row) {
+									return row.without('password')
+										.merge({
+											visit_count: row('visits').count()
+										})
+								})
+							```
+						</script>
+					</section>
+					<section data-markdown>
+						<script type="text/template">
+							##Join
+							```javascript
+							r.db('my_database').table('my_table_1')
+								.eqJoin(
+									'table_2_id',
+									r.db('my_database').table('my_table_2')
+								)
+							```
+						</script>
+					</section>
+					<section data-markdown>
+						<script type="text/template">
+							##Changes
+							```javascript
+							r.db('my_database').table('my_table_1')
+								.filter({
+									status: 'available'
+								})
+								.changes()
+							```
+						</script>
+					</section>
+					<section>
+						<img data-src="img/caveman.jpg">
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Tools</h2>
+						<h3>Web interface</h3>
+						<img data-src="img/home.png" height="500px">
+					</section>
+					<section data-markdown>
+						<script type="text/template">
+							##Tools
+							###Command line
+							Dump
+							```javascript
+							rethinkdb-export -c my-server.com:28015
+								-e domraider.orders
+								-d export/path/
+							```
+							Restore
+							```javascript
+							rethinkdb-import -c another-server.com:28015 -d export/path/
+							```
+						</script>
+					</section>
+				</section>
+
+				<section>
+					<section>
+						<h2>Architecture</h2>
+						<p>lock free</p>
+					</section>
+					<section>
+						<h2>Architecture</h2>
+						<h3>Indexing</h3>
+						<p>Primary Key</p>
+						<p>Secondary Index</p>
+						<p>Composed Index</p>
+					</section>
+					<section>
+						<h2>Architecture</h2>
+						<h3>Sharding</h3>
+<!------------>
+					</section>
+					<section>
+						<h2>Architecture</h2>
+						<h3>Over servers</h3>
+<!------------>
+					</section>
+					<section>
+						<h2>Architecture</h2>
+						<h3>Scaling</h3>
+<!------------>
+					</section>
+					<section>
+						<h2>Architecture</h2>
+						<h3>Availability</h3>
+<!------------>
+					</section>
+				</section>
+				<section>
+					<h2>Performance</h2>
+					<h3>vs. MongoDB</h3>
+					Insert<br>
+					<img data-src="img/insert.png" height="160px"><br>
+					Read<br>
+					<img data-src="img/read.png" height="160px">
+				</section>
+				<section>
+					<h1>Thank you</h1>
+					<p><small>by Etienne Roudeix / <a href="http://twitter.com/__etienne">@__etienne</a></small></p>
+					<p>
+						<a href="http://github.roudeix.net/talks-rethinkDB" target="_blank">
+							http://github.roudeix.net/talks-rethinkDB
+						</a>
+					</p>
+				</section>
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				history: true,
+
+				// More info https://github.com/hakimel/reveal.js#dependencies
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+		</script>
+	</body>
+</html>
